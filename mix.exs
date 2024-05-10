@@ -66,7 +66,12 @@ defmodule Surface.Catalogue.MixProject do
 
   defp deps do
     [
-      {:surface, "~> 0.10", github: "surface-ui/surface"},
+      {:surface,
+       github: "surface-ui/surface",
+       ref: "eb32f370f75d332d2b3fdec6a0c16882676f788f",
+       override: true},
+      {:surface_form,
+       github: "surface-ui/surface_form", ref: "3da6cf734bae2ef63e2f864633f109663f56b5ad"},
       {:earmark, "~> 1.4.21"},
       {:makeup_elixir, "~> 0.16.0"},
       {:html_entities, "~> 0.4"},
