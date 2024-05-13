@@ -1,7 +1,7 @@
 # Surface Catalogue
 
 This is mostly a prototype, meant to validate a few ideas to have something similar to
-https://storybook.js.org/ for [Surface](https://github.com/msaraiva/surface).
+<https://storybook.js.org/> for [Surface](https://github.com/msaraiva/surface).
 
 ## Installation
 
@@ -10,7 +10,7 @@ Add `surface_catalogue` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:surface_catalogue, "~> 0.6.0"}
+    {:surface_catalogue, "~> 0.6.2"}
   ]
 end
 ```
@@ -179,21 +179,21 @@ end
 
 Run the server with:
 
-```
+```bash
 mix dev
 ```
 
 or using `iex`:
 
-```
+```bash
 iex -S mix dev
 ```
 
-You can now access the catalogue at [localhost:4000](http://localhost:4000/).
+You can now access the catalogue at [localhost:4000](http://localhost:4000/catalogue/).
 
 If you need, you can also start the server using a different port:
 
-```
+```bash
 PORT=4444 iex -S mix dev
 ```
 

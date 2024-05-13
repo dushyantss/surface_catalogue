@@ -3,13 +3,9 @@ defmodule Surface.Catalogue.Components.PropInput do
 
   use Surface.Component
 
-  alias Surface.Components.Form.{TextInput, Checkbox, Select, NumberInput}
-
   prop prop, :map
 
   prop value, :any
-
-  prop form, :form
 
   prop nil_placeholder, :string, default: "nil"
 
@@ -26,7 +22,7 @@ defmodule Surface.Catalogue.Components.PropInput do
       <div class="field-body">
         <div class="field" style="display:flex; align-items:center;">
           <div class="control" style="width: 400px;">
-            <.input prop={@prop} value={@value} form={@form} placeholder={@placeholder} />
+            <.input prop={@prop} value={@value} placeholder={@placeholder} />
           </div>
         </div>
       </div>
@@ -39,126 +35,168 @@ defmodule Surface.Catalogue.Components.PropInput do
     "#{prop.name}#{required_str}"
   end
 
-  defp input(%{prop: prop, value: value, form: form} = assigns) do
-    case {prop.type, get_choices(prop)} do
+  defp input(assigns) do
+    case {assigns.prop.type, get_choices(assigns.prop)} do
       {:boolean, _} ->
-        ~F"""
-        <Checkbox field={prop.name} value={value} opts={style: "height: 26px;"} form={form} />
+        assigns =
+          assign_new(assigns, :checked, fn ->
+            Phoenix.HTML.Form.normalize_value("checkbox", assigns[:value])
+          end)
 
-        {error_message(prop)}
+        ~F"""
+        <input name={"props_values[#{@prop.name}]"} type="hidden" value="false">
+        <input
+          checked={@checked}
+          id={"props_values_#{@prop.name}"}
+          name={"props_values[#{@prop.name}]"}
+          style="height: 26px;"
+          type="checkbox"
+          value="true"
+        />
+
+        {error_message(@prop)}
         """
 
       {:string, []} ->
         ~F"""
-        <TextInput
-          field={prop.name}
-          value={value}
+        <input
           class="input is-small"
-          opts={placeholder: @placeholder, phx_keydown: "text_prop_keydown", phx_value_prop: prop.name}
-          form={form}
+          id={"props_values_#{@prop.name}"}
+          name={"props_values[#{@prop.name}]"}
+          phx-keydown="text_prop_keydown"
+          phx-value-prop={@prop.name}
+          type="text"
+          {=@value}
+          {=@placeholder}
         />
 
-        {error_message(prop)}
+        {error_message(@prop)}
         """
 
       {:string, choices} ->
+        assigns = assign(assigns, choices: choices)
+
         ~F"""
         <div class="select is-small">
-          <Select field={prop.name} options={choices} selected={value} form={form} />
+          <select id={"props_values_#{@prop.name}"} name={"props_values[#{@prop.name}]"}>
+            {Phoenix.HTML.Form.options_for_select(@choices, @value)}
+          </select>
         </div>
 
-        {error_message(prop)}
+        {error_message(@prop)}
         """
 
       {:atom, []} ->
         ~F"""
-        <TextInput
-          field={prop.name}
-          value={value_to_string(value)}
+        <input
           class="input is-small"
-          opts={placeholder: @placeholder}
-          form={form}
+          id={"props_values_#{@prop.name}"}
+          name={"props_values[#{@prop.name}]"}
+          phx-keydown="text_prop_keydown"
+          phx-value-prop={@prop.name}
+          type="text"
+          value={value_to_string(@value)}
+          {=@placeholder}
         />
 
-        {error_message(prop)}
+        {error_message(@prop)}
         """
 
       {:atom, choices} ->
         choices = Enum.map(choices, fn {k, v} -> {inspect(k), inspect(v)} end)
+        assigns = assign(assigns, choices: choices)
 
         ~F"""
         <div class="select is-small">
-          <Select field={prop.name} options={choices} selected={value_to_string(value)} form={form} />
+          <select id={"props_values_#{@prop.name}"} name={"props_values[#{@prop.name}]"}>
+            {Phoenix.HTML.Form.options_for_select(@choices, value_to_string(@value))}
+          </select>
         </div>
 
-        {error_message(prop)}
+        {error_message(@prop)}
         """
 
       {:css_class, _} ->
         ~F"""
-        <TextInput
-          field={prop.name}
-          value={css_value_to_string(value)}
+        <input
           class="input is-small"
-          opts={placeholder: @placeholder, phx_keydown: "text_prop_keydown", phx_value_prop: prop.name}
-          form={form}
+          id={"props_values_#{@prop.name}"}
+          name={"props_values[#{@prop.name}]"}
+          phx-keydown="text_prop_keydown"
+          phx-value-prop={@prop.name}
+          type="text"
+          value={css_value_to_string(@value)}
+          {=@placeholder}
         />
 
-        {error_message(prop)}
+        {error_message(@prop)}
         """
 
       {:number, []} ->
         ~F"""
-        <NumberInput
-          field={prop.name}
-          value={value}
+        <input
           class="input is-small"
-          opts={placeholder: @placeholder}
-          form={form}
+          id={"props_values_#{@prop.name}"}
+          name={"props_values[#{@prop.name}]"}
+          phx-keydown="text_prop_keydown"
+          phx-value-prop={@prop.name}
+          type="number"
+          {=@value}
+          {=@placeholder}
         />
 
-        {error_message(prop)}
+        {error_message(@prop)}
         """
 
       {:integer, []} ->
         ~F"""
-        <NumberInput
-          field={prop.name}
-          value={value}
+        <input
           class="input is-small"
-          opts={placeholder: @placeholder}
-          form={form}
+          id={"props_values_#{@prop.name}"}
+          name={"props_values[#{@prop.name}]"}
+          phx-keydown="text_prop_keydown"
+          phx-value-prop={@prop.name}
+          type="number"
+          {=@value}
+          {=@placeholder}
         />
 
-        {error_message(prop)}
+        {error_message(@prop)}
         """
 
       {:integer, choices} ->
+        assigns = assign(assigns, choices: choices)
+
         ~F"""
         <div class="select is-small">
-          <Select field={prop.name} options={choices} selected={value} form={form} />
+          <select id={"props_values_#{@prop.name}"} name={"props_values[#{@prop.name}]"}>
+            {Phoenix.HTML.Form.options_for_select(@choices, @value)}
+          </select>
         </div>
 
-        {error_message(prop)}
+        {error_message(@prop)}
         """
 
       {type, []} when type in [:list, :keyword] ->
         ~F"""
-        <TextInput
-          field={prop.name}
-          value={value_to_string(value)}
+        <input
           class="input is-small"
-          opts={placeholder: @placeholder, phx_keydown: "text_prop_keydown", phx_value_prop: prop.name}
-          form={form}
+          id={"props_values_#{@prop.name}"}
+          name={"props_values[#{@prop.name}]"}
+          phx-keydown="text_prop_keydown"
+          phx-value-prop={@prop.name}
+          type="text"
+          value={value_to_string(@value)}
+          {=@placeholder}
         />
 
-        {error_message(prop)}
+        {error_message(@prop)}
         """
 
-      {type, _} ->
+      {_type, _} ->
         ~F"""
         <span class="is-size-7">
-          [editor not available for type <b>{inspect(type)}</b>]
+          [editor not available for type <b>{inspect(@prop.type)}</b>]
         </span>
         """
     end
